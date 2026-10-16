@@ -39,7 +39,7 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
-      - name: Dependency audit (release gate: no high or critical)
+      - name: "Dependency audit (release gate: no high or critical)"
         run: npm audit --audit-level=high
       - name: Secret scan (local patterns)
         run: npm run scan:secrets
