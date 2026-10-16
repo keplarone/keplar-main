@@ -9,7 +9,7 @@
     "start:api": "node dist/api-main.js",
     "start:worker": "node dist/worker-main.js",
     "migrate": "tsx src/db/migrate-main.ts",
-    "build": "tsup src/api-main.ts src/worker-main.ts src/db/migrate-main.ts --format esm --target node22 --clean --noExternal @keplar/contracts && cp -r src/db/migrations dist/migrations",
+    "build": "rm -rf dist && tsup && cp -r src/db/migrations dist/migrations",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run"
   },

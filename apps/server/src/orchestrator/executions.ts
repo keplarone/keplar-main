@@ -37,7 +37,7 @@ export async function createExecution(db: Db, ctx: AuthContext, goal: string, op
     const executionId = ins.rows[0]!.id;
     await tx.query(
       `INSERT INTO execution_events (workspace_id, execution_id, from_status, to_status, actor, reason) VALUES ($1, $2, NULL, 'awaiting_approval', $3, $4)`,
-      [ctx.workspaceId, executionId, `user:${ctx.userId}`, `Planned ${built.tasks.length} tasks with ${built.planner}`],
+      [ctx.workspaceId, executionId, `user:${ctx.userId}`, `Planned ${built.tasks.length} ${built.tasks.length === 1 ? "task" : "tasks"} with ${built.planner}`],
     );
     for (const t of built.tasks) {
       const row = await tx.query<{ id: string }>(

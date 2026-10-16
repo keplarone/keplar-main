@@ -76,7 +76,7 @@ export async function finalizeIfDone(tx: Tx, workspaceId: string, executionId: s
   const now = new Date();
   await transitionExecution(tx, exec, exec.status, status, {
     actor,
-    reason: `All ${tasks.length} tasks reached a final state`,
+    reason: tasks.length === 1 ? "The only task reached a final state" : `All ${tasks.length} tasks reached a final state`,
     set: { charged_mc: chargedMc, completed_at: now },
   });
   const receipt = await buildReceipt(tx, { ...exec, status, chargedMc, completedAt: now });
