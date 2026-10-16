@@ -1,0 +1,22 @@
+{
+  "name": "keplar-one",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*", "apps/*"],
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build -w @keplar/web && npm run build -w @keplar/server",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test -w @keplar/server",
+    "test:e2e": "playwright test",
+    "db:migrate": "npm run migrate -w @keplar/server",
+    "scan:secrets": "node scripts/scan-secrets.mjs",
+    "audit:deps": "npm audit --omit=dev --audit-level=high"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.56.1",
+    "typescript": "5.9.3"
+  }
+}
