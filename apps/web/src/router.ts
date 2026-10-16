@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-export type Route = { name: "home" } | { name: "execution"; id: string } | { name: "not_found" };
+export type Route = { name: "home" } | { name: "usage" } | { name: "execution"; id: string } | { name: "not_found" };
 
 function parse(pathname: string): Route {
   if (pathname === "/" || pathname === "") return { name: "home" };
+  if (pathname === "/usage" || pathname === "/usage/") return { name: "usage" };
   const m = /^\/e\/([0-9a-f-]{36})\/?$/i.exec(pathname);
   if (m) return { name: "execution", id: m[1]! };
   return { name: "not_found" };

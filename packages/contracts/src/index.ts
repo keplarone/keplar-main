@@ -141,6 +141,27 @@ export interface AccountSummary {
   modelProvider: { configured: boolean; provider: string | null };
 }
 
+/** Usage for the current credit period. Money is in USD micros (1e-6 USD); credits in millicredits. */
+export interface UsageSummary {
+  period: { start: string; end: string };
+  credits: { grantedMc: number; availableMc: number; reservedMc: number; chargedMc: number };
+  requests: { used: number; limit: number };
+  executions: { total: number; byStatus: Partial<Record<ExecutionState, number>> };
+  capabilities: { capability: string; tasks: number; chargedMc: number }[];
+  models: { provider: string; model: string; calls: number; failures: number; inputTokens: number; outputTokens: number; costUsdMicros: number }[];
+  providerCostUsdMicros: number;
+  ledger: {
+    id: number;
+    kind: "grant" | "reserve" | "release" | "charge";
+    amountMc: number;
+    availableAfterMc: number;
+    executionId: string | null;
+    goal: string | null;
+    memo: string | null;
+    createdAt: string;
+  }[];
+}
+
 export interface TaskView {
   id: string;
   key: string;

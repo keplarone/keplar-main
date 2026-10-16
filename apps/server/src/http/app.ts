@@ -12,6 +12,7 @@ import type { AuthContext } from "../auth/service.js";
 import { csrfMatches, login, resolveSession, revokeSession, signup, toSessionInfo } from "../auth/service.js";
 import { getAccount } from "../billing/credits.js";
 import { getPlan } from "../billing/plans.js";
+import { getUsage } from "../billing/usage.js";
 import { CAPABILITIES } from "../capabilities/catalog.js";
 import type { AppConfig } from "../config.js";
 import type { Db } from "../db/pool.js";
@@ -204,6 +205,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const id = await createExecution(db, auth, goal, { modelProviderConfigured: deps.modelProviderConfigured });
     return reply.status(201).send(await getExecutionView(db, auth, id));
   });
+
+  app.get("/api/v1/usage", async (req) => getUsage(db, requireAuth(req)));
 
   app.get("/api/v1/executions", async (req) => listExecutions(db, requireAuth(req)));
   app.get("/api/v1/executions/:id", async (req) => getExecutionView(db, requireAuth(req), idParam(req)));

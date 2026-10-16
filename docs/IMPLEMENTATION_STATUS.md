@@ -21,12 +21,13 @@ Legend: **Implemented** = working code with automated tests. **Partial** = code 
 | Independent verifier | Implemented | `unit.test.ts`, `execution.test.ts` |
 | Outcome receipts with digest | Implemented | `execution.test.ts`, e2e (browser digest check) |
 | Credits: plans, reservations, settlement, request quota | Implemented | `isolation-and-billing.test.ts` |
+| Usage and credits page: period credits, spend by step, model token cost, credit ledger | Implemented | `usage.test.ts`, e2e (desktop, 390 px dark, axe) |
 | Web app: sign-in, composer, plan approval, live progress, results, receipt, history | Implemented | `e2e/vertical-slice.spec.ts` with axe, 390 px, dark mode, keyboard |
 | CI (typecheck, tests, build, audit, secret scans, CodeQL, e2e) | **Partial** | Workflow written; **not yet run on GitHub** |
 
 ## Not started
 
-Stripe billing and invoices · OAuth integrations (GitHub, Google, etc.) · web search · website/app generation · multi-agent orchestration · workflow marketplace · usage/cost dashboard UI · team workspaces and roles UI · deployment, metrics, tracing, alerting · email verification and password reset · MFA · receipt signing · Postgres RLS.
+Stripe billing and invoices · OAuth integrations (GitHub, Google, etc.) · web search · website/app generation · multi-agent orchestration · workflow marketplace · team workspaces and roles UI · deployment, metrics, tracing, alerting · email verification and password reset · MFA · receipt signing · Postgres RLS.
 
 ## Last verified run (local, this environment)
 
@@ -42,6 +43,5 @@ See the PR description for exact counts; re-run with `npm test` and `npm run tes
 
 1. Run CI on GitHub and fix anything environment-specific.
 2. Live-model integration test behind a key, plus prompt-injection evals.
-3. Usage and cost dashboard (data already recorded in `model_calls` and the ledger).
-4. Email verification and password reset.
-5. Choose hosting; staging deployment with smoke tests.
+3. Email verification and password reset.
+4. Choose hosting; staging deployment with smoke tests.

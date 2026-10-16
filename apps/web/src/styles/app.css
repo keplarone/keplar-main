@@ -365,6 +365,15 @@ time.mono {
   text-align: end;
 }
 
+a.credit-meter {
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+a.credit-meter:hover .credit-text {
+  color: var(--ink);
+}
+
 .credit-text strong {
   color: var(--ink);
   font-weight: 600;
@@ -407,6 +416,27 @@ time.mono {
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--ink-3);
+}
+
+.sidebar-link {
+  display: block;
+  padding: var(--s-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.sidebar-link:hover {
+  background: var(--surface-sunk);
+  color: var(--ink);
+}
+
+.sidebar-link.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 var(--rule) var(--line);
 }
 
 .history {
@@ -959,6 +989,93 @@ time.mono {
   color: var(--ink-3);
 }
 
+/* usage */
+.usage > section {
+  margin-block-start: var(--s-10);
+}
+
+.usage-bar {
+  display: flex;
+  block-size: 10px;
+  border-radius: 5px;
+  background: var(--surface-sunk);
+  box-shadow: inset 0 0 0 var(--rule) var(--line);
+  overflow: hidden;
+}
+
+.usage-bar .seg {
+  display: block;
+  block-size: 100%;
+}
+
+.seg.used,
+.key.used {
+  background: var(--ink);
+}
+
+.seg.reserved,
+.key.reserved {
+  background: var(--signal);
+}
+
+.key.available {
+  background: var(--surface-sunk);
+  box-shadow: inset 0 0 0 var(--rule) var(--line-strong);
+}
+
+.usage-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--s-4);
+  margin-block-start: var(--s-4);
+}
+
+.usage-stats dt {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+}
+
+.usage-stats dd {
+  margin: var(--s-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  color: var(--ink);
+}
+
+.key {
+  display: inline-block;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 2px;
+}
+
+.usage-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin: var(--s-5) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.usage-statuses li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
 /* artifacts */
 .artifact-list {
   list-style: none;
@@ -1051,6 +1168,10 @@ time.mono {
   text-align: end;
   font-family: var(--font-mono);
   padding-inline-end: 0;
+}
+
+.receipt-table .num + .num {
+  padding-inline-start: var(--s-4);
 }
 
 .receipt-group th {

@@ -1,4 +1,4 @@
-import type { AccountSummary, ApiErrorBody, ExecutionListItem, ExecutionView, OutcomeReceipt, SessionInfo } from "@keplar/contracts";
+import type { AccountSummary, ApiErrorBody, ExecutionListItem, ExecutionView, OutcomeReceipt, SessionInfo, UsageSummary } from "@keplar/contracts";
 
 export class ApiError extends Error {
   constructor(
@@ -42,6 +42,7 @@ export const api = {
   login: (email: string, password: string) => request<SessionInfo>("POST", "/api/v1/auth/login", { email, password }),
   logout: () => request<void>("POST", "/api/v1/auth/logout"),
   account: () => request<AccountSummary>("GET", "/api/v1/account"),
+  usage: () => request<UsageSummary>("GET", "/api/v1/usage"),
   executions: () => request<ExecutionListItem[]>("GET", "/api/v1/executions"),
   execution: (id: string) => request<ExecutionView>("GET", `/api/v1/executions/${encodeURIComponent(id)}`),
   plan: (goal: string) => request<ExecutionView>("POST", "/api/v1/executions", { goal }),

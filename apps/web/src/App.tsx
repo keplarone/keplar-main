@@ -5,6 +5,7 @@ import { ApiError, api, setCsrfToken } from "./api";
 import { AuthScreen } from "./components/AuthScreen";
 import { Composer } from "./components/Composer";
 import { ExecutionPage } from "./components/ExecutionPage";
+import { UsagePage } from "./components/UsagePage";
 import { ExecutionStatus, Mark, relativeTime } from "./components/primitives";
 import { navigate, useRoute } from "./router";
 import { ThemeToggle } from "./theme";
@@ -13,14 +14,22 @@ function CreditMeter({ account }: { account: AccountSummary }) {
   const { availableMc, grantedMc, reservedMc } = account.credits;
   const pct = grantedMc > 0 ? Math.max(0, Math.min(100, (availableMc / grantedMc) * 100)) : 0;
   return (
-    <div className="credit-meter" title={`${formatCredits(reservedMc)} credits reserved for running work`}>
+    <a
+      className="credit-meter"
+      href="/usage"
+      title={`${formatCredits(reservedMc)} credits reserved for running work`}
+      onClick={(e) => {
+        e.preventDefault();
+        navigate("/usage");
+      }}
+    >
       <span className="credit-text">
         <strong>{formatCredits(availableMc)}</strong> of {formatCredits(grantedMc)} credits · {account.plan.name}
       </span>
       <span className="credit-bar" role="meter" aria-label="Credits available" aria-valuemin={0} aria-valuemax={grantedMc / 1000} aria-valuenow={availableMc / 1000}>
         <span style={{ inlineSize: `${pct}%` }} />
       </span>
-    </div>
+    </a>
   );
 }
 
@@ -153,6 +162,18 @@ export function App() {
         >
           New goal
         </button>
+        <a
+          href="/usage"
+          className={`sidebar-link${route.name === "usage" ? " active" : ""}`}
+          aria-current={route.name === "usage" ? "page" : undefined}
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/usage");
+            setNavOpen(false);
+          }}
+        >
+          Usage and credits
+        </a>
         <h2 className="sidebar-title">Recent</h2>
         <History items={history} activeId={activeId} onPick={() => setNavOpen(false)} />
         <p className="sidebar-foot">
@@ -167,6 +188,7 @@ export function App() {
       </nav>
       <main id="main" className="main">
         {route.name === "home" && <Composer onPlanned={refresh} />}
+        {route.name === "usage" && <UsagePage />}
         {route.name === "execution" && <ExecutionPage id={route.id} account={account} onChanged={refresh} />}
         {route.name === "not_found" && (
           <section className="empty-state">

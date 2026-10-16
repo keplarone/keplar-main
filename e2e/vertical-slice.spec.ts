@@ -68,6 +68,20 @@ test("a goal becomes a plan, runs after approval, is verified and produces a rec
   // History lists the execution, and credits reflect the actual charge (5 − 0.3).
   await expect(page.getByRole("navigation", { name: "Goal history" }).getByText("Write a launch plan")).toBeVisible();
   await expect(page.getByText(/4\.7\s*of 5 credits/)).toBeVisible();
+
+  // The credit meter opens usage, built from the ledger and verified steps.
+  await page.getByRole("link", { name: /4\.7\s*of 5 credits/ }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "0.3 credits used this period" })).toBeFocused();
+  const capabilities = page.getByRole("region", { name: "Where credits went" });
+  await expect(capabilities.getByRole("row", { name: /Write a document\s+1\s+0\.3/ })).toBeVisible();
+  await expect(page.getByText(/No AI model was called this period/)).toBeVisible();
+  const ledger = page.getByRole("region", { name: "Credit ledger" });
+  await expect(ledger.getByRole("row", { name: /Charged · Write a launch plan/ })).toBeVisible();
+  await expect(ledger.getByRole("row", { name: /Monthly grant/ })).toBeVisible();
+  await expectAccessible(page, "usage");
+  await shot(page, "07-usage");
+  await ledger.getByRole("link", { name: /Write a launch plan/ }).first().click();
+  await expect(page.getByRole("heading", { name: "Outcome receipt" })).toBeVisible();
   expect(csp).toEqual([]);
 });
 
@@ -102,6 +116,13 @@ test("works at phone width without horizontal scrolling, in dark mode", async ({
   await page.getByRole("button", { name: "Show history" }).click();
   await expect(page.getByRole("navigation", { name: "Goal history" }).getByText("Make a checklist")).toBeVisible();
   await expectAccessible(page, "mobile dark history");
+
+  await page.getByRole("link", { name: "Usage and credits" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: /credits used this period/ })).toBeVisible();
+  const usageOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(usageOverflow).toBeLessThanOrEqual(0);
+  await expectAccessible(page, "mobile dark usage");
+  await shot(page, "08-mobile-dark-usage");
 });
 
 test("keyboard users can skip to content and submit with Ctrl+Enter", async ({ page }) => {
