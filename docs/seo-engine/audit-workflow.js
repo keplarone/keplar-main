@@ -13,6 +13,7 @@ export const meta = {
 
 const REPO = (args && args.repo) || '/home/user/keplar-live'
 const DATE = (args && args.date) || 'unknown date'
+const VERIFY_PER_DIM = 4
 
 const CONTEXT = `You are auditing the production codebase of keplar.one (Next.js 16 App Router) at ${REPO} on ${DATE}, for a program whose goal is qualified organic search discovery and conversion. READ ONLY: do not modify any file. Observed facts only; never invent traffic, rankings, volumes or indexing states. Cite every finding with a repo-relative file path and, where possible, a line or symbol. Existing SEO infrastructure (do not propose rebuilding it): src/lib/seo.ts pageMeta(); src/app/sitemap.ts plus answers-/templates-/topics-sitemap.xml routes; src/app/robots.ts; src/lib/structuredData.ts, seo-graph.ts, kb/jsonld.ts; content/**/*.md loaded by src/lib/kb/*; src/lib/content/*.ts (landing, editorial, guides, lastmod, product-facts); src/lib/compare.ts; tests/seo-*.test.ts, kb-content.test.ts; scripts/seo-crawl.mjs; docs/seo/*. Prior audit: docs/seo/AUDIT.md (3 Oct 2026). Content rules enforced by tests: no invented numbers or testimonials, no accuracy/confidence claims, Keplar is not AGI, prices only from src/lib/tiers.ts, US English, no blue in graphics.`
 
@@ -80,17 +81,21 @@ const results = await pipeline(
     if (!dim) return null
     const toVerify = dim.findings.filter((f) => f.severity === 'Critical' || f.severity === 'High')
     const rest = dim.findings.filter((f) => !(f.severity === 'Critical' || f.severity === 'High')).map((f) => ({ ...f, verdict: 'unverified' }))
-    const verified = await parallel(toVerify.map((f) => async () => {
-      const [repro, value] = await parallel([
-        () => agent(`${CONTEXT}\n\nTry to REFUTE this audit finding by reading the cited files. Refuted means the evidence does not exist as described or the code already handles it. Default to refuted=true if you cannot confirm it.\n\n${JSON.stringify(f, null, 2)}`, { label: `verify:repro:${f.id}`, phase: 'Verify', schema: VERDICT_SCHEMA, effort: 'high' }),
-        () => agent(`${CONTEXT}\n\nJudge whether this finding's severity is right for a program optimizing qualified organic discovery and conversion. Would fixing it change what search engines or AI answer engines discover, index, or say about Keplar, or what visitors do? Propose correctedSeverity. refuted=true only if the finding is cosmetic with no plausible effect.\n\n${JSON.stringify(f, null, 2)}`, { label: `verify:value:${f.id}`, phase: 'Verify', schema: VERDICT_SCHEMA, effort: 'high' }),
-      ])
-      if (!repro || !value) return { ...f, verdict: 'unverified' }
-      if (repro.refuted && repro.confidence !== 'low') return { ...f, verdict: 'refuted', refutation: repro.reasoning }
-      const sev = value.refuted ? 'Low' : value.correctedSeverity
-      return { ...f, severity: sev, verdict: 'confirmed', reproNote: repro.reasoning, valueNote: value.reasoning }
+    // The host runs min(16, cpus-2) agents at a time (2 on a 4-CPU box), so verification is one combined lens per finding,
+    // Critical first, at most VERIFY_PER_DIM per dimension; the rest are kept as "unverified" and counted in the log.
+    const order = { Critical: 0, High: 1 }
+    const ranked = [...toVerify].sort((a, b) => (order[a.severity] ?? 2) - (order[b.severity] ?? 2))
+    const chosen = ranked.slice(0, VERIFY_PER_DIM)
+    const skipped = ranked.slice(VERIFY_PER_DIM).map((f) => ({ ...f, verdict: 'unverified' }))
+    if (skipped.length) log(`${dim.key}: ${skipped.length} High finding(s) left unverified (cap ${VERIFY_PER_DIM})`)
+    const verified = await parallel(chosen.map((f) => async () => {
+      const v = await agent(`${CONTEXT}\n\nVerify this audit finding by reading the cited files. First try to REFUTE it: refuted=true if the evidence does not exist as described, the code already handles it, or you cannot confirm it. If it stands, judge whether its severity is right for a program optimizing qualified organic discovery and conversion (would fixing it change what search engines or AI answer engines discover, index or say about Keplar, or what visitors do?) and set correctedSeverity.\n\n${JSON.stringify(f, null, 2)}`, { label: `verify:${f.id}`, phase: 'Verify', schema: VERDICT_SCHEMA, effort: 'medium' })
+      if (!v) return { ...f, verdict: 'unverified' }
+      if (v.refuted && v.confidence !== 'low') return { ...f, verdict: 'refuted', refutation: v.reasoning }
+      return { ...f, severity: v.correctedSeverity, verdict: 'confirmed', verifyNote: v.reasoning }
     }))
-    return { ...dim, findings: [...verified.filter(Boolean), ...rest] }
+    const rest2 = [...rest, ...skipped]
+    return { ...dim, findings: [...verified.filter(Boolean), ...rest2] }
   },
 )
 const dims = results.filter(Boolean)
