@@ -1,9 +1,26 @@
 # Search Intent Domination Engine — Checkpoint
 
-**Saved:** 2026-10-17 (session `session_01AcDyxethSahbR5fczm1o2Z`)
-**Status:** Phase 1 (audit) partially complete. **No product code has been changed in any repository.** Resume from "Continuation instructions" below.
+**Updated:** 2026-10-19 (session `session_01AcDyxethSahbR5fczm1o2Z`), first saved 2026-10-17.
+**Where the work is:** `keplarone/keplar-live`, local branch `claude/seo-intent-engine` from `origin/main@1c011fe`, commits `587f7ef` and the title fix on top (not pushed at the time of this update; pushed once the full gate passes). This repository (`keplar-main`) holds only the checkpoint and the audit workflow.
 
-Legend for every claim in this file: **Observed** = read from the repository or a tool result in this session. **Preliminary** = reasoned from what was read, not yet verified by a second pass. Nothing here is a traffic, ranking or indexing claim.
+Legend for every claim in this file: **Observed** = read from the repository or a tool result in this session. **Preliminary** = reasoned, not verified by a second pass. Nothing here is a traffic, ranking or indexing claim.
+
+## 0. State at this update (observed)
+
+| Phase | State |
+|---|---|
+| 1 Audit | 13 dimension agents finished (results in the workflow journal, run `wf_1f993f99-212`); per-finding verification still running; synthesis pending. Findings acted on so far are listed in §8. |
+| 2–3 Clusters, templates, programmatic foundation | Done: `src/lib/seo/clusters.ts` (11 clusters), `ClusterLinks`, five new hubs, two hubs expanded, `src/lib/seo/quality.ts` gates, `/sitemap-index.xml` + registry, footer topic row, home explore links and lede. |
+| 4 Free tools | Done: `src/lib/free-tools/*`, `/tools` + 10 pages, `/api/tools/run`, tests. Rendered and exercised locally. |
+| 5 AI-search facts | Partly: glossary API fix, blog search titles, metadata trims, pricing metadata from plan data. Pending: web-search, Business-pricing, agents and API statements (§8). |
+| 6 Reports | Not started (plan: `content/reports/*.md` from `docs/core-intelligence-evals.md`). |
+| 7 Public sharing gates | Pending: moderation + kill switch for public answers; template detail content. |
+| 8 Conversion | Partly: cluster product CTAs; pending: honest labels for signed-out visitors, tracked CTAs on hubs. |
+| 9 SEO QA in CI | Pending: post-build crawl gate in `verify.mjs` and `ci.yml`. |
+| 10 Measurement | Partly: telemetry on `/`, landing-capture fix, checkout attribution → `whop_payments` → `/admin/seo`. Pending: Search Console module. |
+| 11 Verify/ship | Full gate (eslint, all unit tests, build) running at this update; then push the branch and open a PR to `keplar-live@main`. |
+
+Baseline on `keplar-live@1c011fe` (observed): tsc clean, eslint clean, unit tests 3,121 pass / 0 fail / 2 skipped, `next build` ok.
 
 ---
 
@@ -136,3 +153,17 @@ Run these in a fresh session started on `keplarone/keplar-main`, branch `claude/
 7. Open one PR to `keplar-live@main` per completed, verified phase. Deploy only after CI is green and per `keplar-live/CLAUDE.md`.
 
 Do not repeat: repository discovery, dependency install investigation, reading of the files listed in §3 (summaries above are accurate as of `757eac7`).
+
+---
+
+## 8. Change log on `keplar-live` (branch `claude/seo-intent-engine`)
+
+Commit `587f7ef` (106 files) plus a title fix. Verified before commit: tsc, eslint, 127 tests across the touched suites, `next build`, rendered pages checked with `next start`.
+
+- Clusters and hubs: `src/lib/seo/clusters.ts`, `src/lib/seo/titles.ts`, `src/components/seo/ClusterLinks.tsx` (wired into landing, blog, docs, use-case templates); new hubs `/ai-research-assistant`, `/ai-image-generator`, `/ai-video-generator`, `/ai-writing-assistant`, `/ai-productivity` in `src/lib/content/landing.ts`; `/ai-study-tool` and `/ai-slideshow-maker` expanded.
+- Quality and sitemaps: `src/lib/seo/quality.ts`, `src/lib/seo/sitemaps.ts`, `src/app/sitemap-index.xml/route.ts`, `robots.ts` reads the registry.
+- Free tools: `src/lib/free-tools/{registry,prompts,cite,plan,explorer}.ts`, `src/components/tools/*`, `src/app/(marketing)/tools/*`, `src/app/api/tools/run/route.ts`; `tool_run` funnel event.
+- Audit fixes: unapproved `/vs/*` noindex; blog `metaTitle` front matter (23 posts); descriptions ≤160 on 20 pages; pricing metadata from `tiers.ts`; `/guides/why-ai-models-disagree` → blog post (redirect, guide removed); cluster product CTAs; footer topic row (`TOPIC_LINKS`) and home explore links; `/topics` linked from the glossary, `/answers` from how-it-works; `/specialists` and `/simulation` joined clusters; telemetry on the chat home; landing capture ignores internal referrers; checkout attribution (`src/lib/seo/attribution.ts`, checkout route, Whop metadata, `sync.ts`, `/admin/seo` table); glossary API entry corrected.
+- Tests added: `seo-quality`, `seo-sitemap-index`, `seo-clusters`, `free-tools`, `seo-attribution`, plus assertions in `seo.test.ts`, `robots.test.ts`, `launch-readiness.test.ts`.
+
+Audit findings still to act on (from the finished dimensions): web-search statements across docs/facts (ASF-01/02), Business pricing statements (ASF-03), agents availability wording (ASF-04, needs owner confirmation of where agents run for Plus/Pro accounts), OpenAPI description vs policy (ASF-05), `/developers` "not available" list (ASF-06), pixel on `/tools` and `/answers` (SEC-01), tool input caps vs the Free prompt cap (FT-1), honest CTA labels for signed-out visitors (CUX-1), tracked CTAs on hubs (CUX-2), public-answers moderation and kill switch (PS-03), template detail content (PS-02), crawl gate in CI (TC-02), Search Console module (M-02). Recommendations only (owner decisions): deploy gating by CI (TC-01), Inter subsets and CSS splitting (PR-2/3), Whop pixel consent (PR-4/M-03), beta-locale duplicate pages (MQ-02).
