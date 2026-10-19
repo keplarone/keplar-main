@@ -169,3 +169,13 @@ Audit findings still to act on (from the finished dimensions): web-search statem
 ## 9. Pull request
 
 Not opened: pull requests are the owner's to open. The branch `claude/seo-intent-engine` is pushed at `90e4df4`; the filled-in body (following `.github/pull_request_template.md`) is in `docs/seo-engine/PR-DRAFT.md`. Opening it against `main` runs the CI workflow (now ending with the SEO gate); merging deploys per `keplar-live/CLAUDE.md`.
+
+---
+
+## 10. Foundations session (19 Oct 2026, "billion-dollar foundations" brief)
+
+- **Branch:** `keplarone/keplar-live` `claude/foundations-economics` from `main@a9e2954` (independent of the SEO branch).
+- **Main moved overnight:** an engineering audit and fixes landed (`docs/engineering-audit-2026-10-19.md`: billing on stopped Core turns, research fences, citation check, atomic limits and webhook claims, pairwise eval), plus `docs/architecture/BASELINE-ENGINE.md` and `ENGINE-ROADMAP.md`. Open PRs #82–#98 own the router lock, release eval, model classifier, Deep Research honesty, reliability and billing reconciliation, growth retention metrics, design fixes and the `authorize()` gate. Do not start work in those areas.
+- **Done on the branch:** per-route performance budget gate (`scripts/perf-budget.mjs`, `perf-budgets.json`, CI and verify steps, tests) with a measured baseline (242–268 KB gzip JS, 462–527 KB raw CSS per marketing page); `/admin` revenue excludes refunds, shows Whop's recorded amounts, and MRR uses the billed price like `/admin/growth`; `docs/architecture/FOUNDATIONS-2026-10-19.md` (architecture map, P0–P3 audit with owners, ownership of open PRs, the ten deliverables, financial instrumentation plan, 12-month roadmap with value, effort, dependencies, risks, metrics, validation and rollback).
+- **Owner decisions surfaced:** require CI before production deploys (P0-2); run a backup and restore drill (P0-1); whether Create stays in the consumer product (P2-6); live eval spend; retrieval on for Deep Research.
+- **Next:** if the owner opens the PR, watch CI; then the Horizon 1 rows in the foundations document.
