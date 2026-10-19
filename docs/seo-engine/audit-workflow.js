@@ -89,7 +89,7 @@ const results = await pipeline(
       if (repro.refuted && repro.confidence !== 'low') return { ...f, verdict: 'refuted', refutation: repro.reasoning }
       const sev = value.refuted ? 'Low' : value.correctedSeverity
       return { ...f, severity: sev, verdict: 'confirmed', reproNote: repro.reasoning, valueNote: value.reasoning }
-    })
+    }))
     return { ...dim, findings: [...verified.filter(Boolean), ...rest] }
   },
 )
