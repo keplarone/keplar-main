@@ -1,7 +1,7 @@
 # Search Intent Domination Engine — Checkpoint
 
 **Updated:** 2026-10-19 (session `session_01AcDyxethSahbR5fczm1o2Z`), first saved 2026-10-17.
-**Where the work is:** `keplarone/keplar-live`, local branch `claude/seo-intent-engine` from `origin/main@1c011fe`, commits `587f7ef` and the title fix on top (not pushed at the time of this update; pushed once the full gate passes). This repository (`keplar-main`) holds only the checkpoint and the audit workflow.
+**Where the work is:** `keplarone/keplar-live`, branch `claude/seo-intent-engine` from `origin/main@1c011fe`, head `90e4df4`, pushed; the pull request is drafted, not opened (§9). This repository (`keplar-main`) holds only the checkpoint and the audit workflow.
 
 Legend for every claim in this file: **Observed** = read from the repository or a tool result in this session. **Preliminary** = reasoned, not verified by a second pass. Nothing here is a traffic, ranking or indexing claim.
 
@@ -9,16 +9,16 @@ Legend for every claim in this file: **Observed** = read from the repository or 
 
 | Phase | State |
 |---|---|
-| 1 Audit | 13 dimension agents finished (results in the workflow journal, run `wf_1f993f99-212`); per-finding verification still running; synthesis pending. Findings acted on so far are listed in §8. |
-| 2–3 Clusters, templates, programmatic foundation | Done: `src/lib/seo/clusters.ts` (11 clusters), `ClusterLinks`, five new hubs, two hubs expanded, `src/lib/seo/quality.ts` gates, `/sitemap-index.xml` + registry, footer topic row, home explore links and lede. |
-| 4 Free tools | Done: `src/lib/free-tools/*`, `/tools` + 10 pages, `/api/tools/run`, tests. Rendered and exercised locally. |
-| 5 AI-search facts | Partly: glossary API fix, blog search titles, metadata trims, pricing metadata from plan data. Pending: web-search, Business-pricing, agents and API statements (§8). |
-| 6 Reports | Not started (plan: `content/reports/*.md` from `docs/core-intelligence-evals.md`). |
-| 7 Public sharing gates | Pending: moderation + kill switch for public answers; template detail content. |
-| 8 Conversion | Partly: cluster product CTAs; pending: honest labels for signed-out visitors, tracked CTAs on hubs. |
-| 9 SEO QA in CI | Pending: post-build crawl gate in `verify.mjs` and `ci.yml`. |
-| 10 Measurement | Partly: telemetry on `/`, landing-capture fix, checkout attribution → `whop_payments` → `/admin/seo`. Pending: Search Console module. |
-| 11 Verify/ship | Full gate (eslint, all unit tests, build) running at this update; then push the branch and open a PR to `keplar-live@main`. |
+| 1 Audit | Done. Workflow `wf_1f993f99-212` finished: 13 dimension audits, 32 verifier verdicts (5 kept High, 18 lowered to Medium, 9 refuted), synthesis and completeness review. Written to `keplar-live/docs/seo/AUDIT-2026-10-19.md` with the status of every High finding at the end of the branch. |
+| 2–3 Clusters, templates, programmatic foundation | Done: `src/lib/seo/clusters.ts` (11 clusters), `ClusterLinks`, five new hubs, two hubs expanded, `src/lib/seo/quality.ts` gates, `/sitemap-index.xml` + registry, footer topic row, home explore links and lede, template detail excerpts (`src/lib/templates/excerpt.ts`). |
+| 4 Free tools | Done: `src/lib/free-tools/*`, `/tools` + 10 pages, `/api/tools/run`, tests; "Free tools" footer label in the 24 stable locales. |
+| 5 AI-search facts | Done: web search, Business pricing, API availability and agents stated one way each (agents wording still needs the owner's confirmation); glossary API fix; blog search titles; 16 descriptions shortened; pricing metadata from plan data; `openapi.ts` quotes `API_STATEMENT`. |
+| 6 Reports | Done: `content/reports/*.md`, `src/lib/kb/reports.ts`, `/reports` and `/reports/[slug]` (Report JSON-LD), sitemap, lastmod, titles, llms.txt, research cluster, `tests/seo-reports.test.ts`. First report: Core evals, October 2026. |
+| 7 Public sharing gates | Done: `moderateText` on publish (code `unsafe`), `KEPLAR_PUBLIC_ANSWERS=off` kill switch (code `paused`; list, open, sitemap all off), tests. Not done: language check, global publish rate cap. |
+| 8 Conversion | Done: honest labels (`productCta` null for chat clusters; primary = no-signup chat, product route secondary), `PageHero where` → `TrackedLink`, tracked CTAs on `/tools`, `/answers`, `/templates`. |
+| 9 SEO QA in CI | Done: `scripts/seo-gate.mjs --start` after Build in `scripts/verify.mjs` and `.github/workflows/ci.yml`. |
+| 10 Measurement | Done in code: telemetry on `/`, landing capture, checkout attribution → `whop_payments` → `/admin/seo`, Search Console module `src/lib/seo/gsc.ts` + admin section, setup steps in `docs/seo/MEASUREMENT.md`. Blocked on the owner's credentials for live figures. |
+| 11 Verify/ship | Full gate on `90e4df4`: tsc clean, eslint clean, unit tests 3,149 pass / 0 fail / 2 skipped (3,151), `next build` ok, SEO gate 213/213 English sitemap pages, no issues. Branch pushed; PR drafted in `PR-DRAFT.md`, not opened. **Not deployed**: merge and deploy are the owner's call after CI. |
 
 Baseline on `keplar-live@1c011fe` (observed): tsc clean, eslint clean, unit tests 3,121 pass / 0 fail / 2 skipped, `next build` ok.
 
@@ -132,27 +132,19 @@ Blocked on the owner: Search Console and Bing verification/API credentials; appr
 
 Run these in a fresh session started on `keplarone/keplar-main`, branch `claude/inspiring-hypatia-meru1j`:
 
-1. Read this file and `docs/seo-engine/audit-workflow.js`.
-2. Attach the product repo and clone it (one clone, ~10-minute timeout):
+1. Read this file; the audit is in `keplar-live/docs/seo/AUDIT-2026-10-19.md` (Part A has the status of every High finding and the open owner decisions).
+2. Attach the product repo and check out the engine branch:
    ```
    add_repo(owner="keplarone", repo="keplar-live", access="push")
-   git clone --depth 1 https://github.com/keplarone/keplar-live /home/user/keplar-live
+   git clone https://github.com/keplarone/keplar-live /home/user/keplar-live
    register_repo_root(owner="keplarone", repo="keplar-live", directory="/home/user/keplar-live")
+   cd /home/user/keplar-live && git checkout claude/seo-intent-engine && npm ci --no-audit --no-fund && npx playwright install chromium
    ```
-3. Install and confirm the baseline still holds:
-   ```
-   cd /home/user/keplar-live && npm ci --no-audit --no-fund
-   npx tsc --noEmit && npx eslint . --quiet
-   npx playwright install chromium
-   npm test
-   BETTER_AUTH_SECRET=ci-build-secret-0123456789abcdefghijklmnop BETTER_AUTH_URL=http://localhost:3199 KEPLAR_DEV_TOOLS=1 KEPLAR_MX_CHECK=off RESEND_API_KEY= npx next build
-   ```
-4. Create the working branch: `git -C /home/user/keplar-live checkout -b claude/seo-intent-engine origin/main` (or the branch the owner names).
-5. Run the audit: `Workflow({ script: <contents of audit-workflow.js>, args: { repo: "/home/user/keplar-live", date: "<today>" } })`. Write the result to `keplar-live/docs/seo/AUDIT-<date>.md` with Critical/High/Medium/Low.
-6. Implement roadmap steps 2–11 in order; after each: `npm run verify:quick`, commit on the working branch, update `keplar-live/docs/seo/PROGRESS.md` and this checkpoint, push with `git push -u origin <branch>`.
-7. Open one PR to `keplar-live@main` per completed, verified phase. Deploy only after CI is green and per `keplar-live/CLAUDE.md`.
+3. If the owner opened the pull request (§9): check its CI verdict and review comments. If `main` moved, merge `origin/main` into the branch (no rebase), run `npm run verify` (it now ends with the SEO gate), push.
+4. If the PR is merged: the owner decides the deploy per `keplar-live/CLAUDE.md`; then verify `https://keplar.one/deploy-stamp.json` contains the merge commit, submit `/sitemap-index.xml` in Search Console (owner), and add the `GSC_*` variables (owner) so `/admin/seo` reads search figures.
+5. Remaining work, in order (all owner decisions or follow-ups, none blocks the PR): RI-2 noindex in metadata for auth pages; beta-locale indexing (RI-3/MQ-02); agents wording (ASF-04); pixel consent (M-03); CI-gated deploys (TC-01); font subsets and CSS split (PR-2/3); language check and global rate cap on public answers; per-tool reporting on `/admin/seo`; the Medium and Low lists in the audit's Part B "Implementation order".
 
-Do not repeat: repository discovery, dependency install investigation, reading of the files listed in §3 (summaries above are accurate as of `757eac7`).
+Do not repeat: the audit (its workflow run is complete and cached: `resumeFromRunId: "wf_1f993f99-212"`), repository discovery, dependency investigation, or any phase marked Done in §0.
 
 ---
 
@@ -167,3 +159,13 @@ Commit `587f7ef` (106 files) plus a title fix. Verified before commit: tsc, esli
 - Tests added: `seo-quality`, `seo-sitemap-index`, `seo-clusters`, `free-tools`, `seo-attribution`, plus assertions in `seo.test.ts`, `robots.test.ts`, `launch-readiness.test.ts`.
 
 Audit findings still to act on (from the finished dimensions): web-search statements across docs/facts (ASF-01/02), Business pricing statements (ASF-03), agents availability wording (ASF-04, needs owner confirmation of where agents run for Plus/Pro accounts), OpenAPI description vs policy (ASF-05), `/developers` "not available" list (ASF-06), pixel on `/tools` and `/answers` (SEC-01), tool input caps vs the Free prompt cap (FT-1), honest CTA labels for signed-out visitors (CUX-1), tracked CTAs on hubs (CUX-2), public-answers moderation and kill switch (PS-03), template detail content (PS-02), crawl gate in CI (TC-02), Search Console module (M-02). Recommendations only (owner decisions): deploy gating by CI (TC-01), Inter subsets and CSS splitting (PR-2/3), Whop pixel consent (PR-4/M-03), beta-locale duplicate pages (MQ-02).
+
+### Second batch (head `90e4df4`), verified by the full gate
+
+- Fixes to the first batch found by the gate: `attribution.ts` split (pure) / `attribution-report.ts` (server) so `WhopEmbed` no longer pulls `node:fs` into the client bundle (the Turbopack build failure); "Free tools" footer label in 24 locale catalogs; robots tests read the sitemap registry; redundant mono rule removed from `tools.module.css`; `PageHero` renders `TrackedLink` only with a placement.
+- Facts and CTAs (batch 1 script): web search statement, Business pricing from `BUSINESS_TIERS`, agents wording, `API_STATEMENT` in `openapi.ts`, `/developers` "not available" list, pixel excluded on `/tools` and `/answers`, tool material caps, honest labels, tracked hub CTAs.
+- Reports family, template excerpts, public-answer moderation and kill switch, Search Console module and admin section, SEO gate in verify and CI, `docs/seo/AUDIT-2026-10-19.md`, `docs/seo/PROGRESS.md` entry, `docs/seo/MEASUREMENT.md` setup steps, `keywords.csv` blog prefix, guide redirect test.
+
+## 9. Pull request
+
+Not opened: pull requests are the owner's to open. The branch `claude/seo-intent-engine` is pushed at `90e4df4`; the filled-in body (following `.github/pull_request_template.md`) is in `docs/seo-engine/PR-DRAFT.md`. Opening it against `main` runs the CI workflow (now ending with the SEO gate); merging deploys per `keplar-live/CLAUDE.md`.
